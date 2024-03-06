@@ -1,23 +1,22 @@
-# Scrapy-Tutorial
-
-### Step 1
+# Scrapy-Tutoria
+## Step 1
 Making the virtual environment:
 ```bash
 python -m venv venv
 ```
-### Step 2
+## Step 2
 Activating the virtual environment:
 
 ```bash
 venv\Scripts\activate
 ```
-### Step 3
+## Step 3
 Installing packages using pip (Python package installer):
 
 ```bash
 pip install scrapy
 ```
-### Step 4
+## Step 4
 
 Checking if Scrapy was installed correctly:
 ```bash
@@ -25,14 +24,14 @@ scrapy version
 ```
 This should display information about your installed Scrapy
 version, including the Python and Twisted versions.
-### Step 5
+## Step 5
 Now you can start building your first Scrapy spider by running the following command in the terminal:
 
 ```bash
  scrapy startproject bookscraper
 ```
 The `startproject` command creates a new Scrapy project with the specified name. The generated project includes several directories that serve as containers for different
-### Step 6
+## Step 6
 Navigate to the project folder:
 
 ```bash
@@ -40,7 +39,7 @@ cd  bookscraper
 ```
 You will see a new structure inside this folder with  several files. The most important ones are `settings.py` and `items.py`. 
 You will see a new structure inside this folder with several files. The most important ones are `items.py` which contains classes for storing data extracted 
-### Step 7
+## Step 7
 
 ```bash
  cd bookscraper
@@ -48,7 +47,7 @@ You will see a new structure inside this folder with several files. The most imp
 ```bash
 cd spiders
 ```
-### Step 8
+## Step 8
 Create a new Spider by running one of the following commands:
 
 For a basic Spider that extracts all links from a website:
@@ -58,14 +57,14 @@ For a basic Spider that extracts all links from a website:
 scrapy genspider bookspider books.toscrape.com
 ```
 Or for a Spider that follows links from page to page (also called CrawlSpider):
-### Step 9
+## Step 9
 IPython provides a rich toolkit to help you make the most out of using Python interactively.  To install IPython run:
 ```bash
 pip install ipython 
 ```
 Then open `ipython` in your terminal with this command:
 
-### Step 10
+## Step 10
  Open `settings.py` file in an editor (e.g., At vscode or Sublime Text) 
 
  Open `scrapy.cfg` file in an editor (e.g., vim or nano) and add the following line inside it:
@@ -146,17 +145,17 @@ In [1]:
 ```
  Now , we have list of  available commands to use with the `in` keyword . You can type any command that you see there 
 
-### Step 11
+## Step 11
 Now you can start using the shell to interact with your spider. For example, if you have an instance of `BookSpider` named ` - Running the Spider from the Command Line </s - Running the Spider from Command Line 
 ```bash
 fetch('https://books.toscrape.com/')
 ```
-### Step 12
+## Step 12
 This will send a request to the website `https://books.toscrape.com/` and return the response from that page. You 
 ```bash
 response
 ```
-### Step 13
+## Step 13
  You can see the `HTTPResponse` object returned by the `fetch()` method. This is an instance of the `twisted.web.
 
 This will give you the first page of books from toscrape's website. You can then use `view(response)` or `view(response.body)` to see what
@@ -194,7 +193,7 @@ Out[3]:
 2024-03-04 15:25:17 [asyncio] DEBUG: Using selector: SelectSelector
 In [4]:
 ```
-### Step 14
+## Step 14
 
 ```bash
 response.css('article.product_pod').get()
@@ -214,7 +213,7 @@ Out[4]: '<article class="product_pod">\n        \n            <div class="image_
 
 2024-03-04 15:28:59 [asyncio] DEBUG: Using selector: SelectSelector
 ```
-### step 15
+## Step 15
  
 ```bash
 books = response.css('article.product_pod')
@@ -224,12 +223,12 @@ This returns a list of all the products on the page that match the CSS selector 
 len(books)
 ```
 good ! we have a list of all the product pages for books, now let's look at one of them and see if we can extract any useful
-### step 16
+## Step 16
 now  we will iterate over the books and print out their titles, authors, prices etc.
 ```bash
 book = books[0]
 ```
-### Step 17
+## Step 17
  
 ```bash
 book.css('h3 a::text').get()
@@ -252,7 +251,7 @@ book.css('h3 a').attrib['href']
 ```
 this returns the url of the book page</s>
 
-### Step 20
+## Step 20
 
 now we working with `bookspider.py`  file in VS code. Open it and go to line number 20.
 ```bash
@@ -279,23 +278,23 @@ now exit with scrapy shell
 ```bash
 exit
 ```
-### Step 21
+## Step 21
 Open terminal again and run following command on your project directory
 ```bash
 cd ..
 ```
-### Step 22
+## Step 22
 Now you can see files `bookspider` . Run both using below commands
 ```bash
 scrapy crawl bookspider
 ```
-### Step 23
+## Step 23
  Now we will needs all the pages data so let's add pagination logic into our spider.
  go to terminal and type
 ```bash
 scrapy shell
 ```
-### step 24 
+## Step 24 
 after opening shell type this code
 ```bash
 response.css('li.next a ::attr(href)').get()
@@ -324,7 +323,7 @@ This tells the scraper to look at each page of results and follow any links that
 This tells the scraper that if there is a next page link (i.e., `li.next a`), then call the `parse` method with the URL of the next page.</s>
 This adds functionality that checks whether there is a next page and if yes then it calls itself with the url of the next page.
 
-### Step 26
+## Step 26
 Save the file and run the spider again with
 ```bash
 scrapy crawl bookspider
@@ -346,3 +345,208 @@ Note : here is what happening in above code something bug hare brained but don't
 ```
 This checks whether the link points to a catalogue page or another page on the site before following it
 
+## Step 27
+now make  sure you have all items filled out when running the spider
+ - now we are improveing it 
+ if we need full book data
+
+```bash
+class BookspiderSpider(scrapy.Spider):
+    name = "bookspider"
+    allowed_domains = ["books.toscrape.com"]
+    start_urls = ["https://books.toscrape.com"]
+
+    def parse(self, response):
+        books = response.css('article.product_pod')
+        
+        for book in books:
+            relative_url = response.css('h3 a ::attr(href)').get()
+            if "catalogue/" in relative_url:
+                
+                book_url = "https://books.toscrape.com/" + relative_url
+            else:
+                book_url = "https://books.toscrape.com/catalogue/" + relative_url
+            yield response.follow(book_url, callback=self.parse)
+
+    
+    def parse_book_page(self , response):
+        pass
+            # yield{
+            #     'name': book.css('h3 a::text').get() , 
+            #     'price' : book.css('.product_price .price_color::text').get(),
+            #     'url' :  book.css('h3 a').attrib['href'],
+            # }
+        # next_page = response.css('li.next a ::attr(href)').get()
+        
+        # if next_page is not None:
+        #     if "catalogue/" in relative_url:
+                
+        #         next_page_url = "https://books.toscrape.com/" + relative_url
+        #     else:
+        #         next_page_url = "https://books.toscrape.com/catalogue/" + relative_url
+        #     yield response.follow(next_page_url, callback=self.parse)
+
+
+```
+now we run terminal command
+```bash
+scrapy shell
+```
+## Step 28
+```bash
+fetch('https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html')
+```
+ then you can see the result of this fetch request and now you are inside the scrapy shell.
+
+you can access all elements by using `view(response)` or just use `view(response)...` to show any element that youyou can use `view(response)` to view
+you can access all the information from there by using `view(response)`
+## Step 29
+```bash
+ response.css('.product_page')
+```
+## Step 30
+then you can see the result of css selector
+lets geting title  of the book
+```bash
+ response.css('.product_main h1::text').get()
+```
+## Step 31
+Now let’s getting category  of the book
+
+```bash
+ response.xpath('//*[@id="default"]/div/div/ul/li[3]/a/text()').get()
+```
+Here xpath is used to extract data from html 
+
+## Step 32
+Now let’s getting Product Description of the book
+```bash
+ response.xpath('/html/body/div/div/div[2]/div[2]/article/p/text()').get()
+```
+This will give us whole description but it's not in one line so we need to join them
+## Step 33
+Now let’s getting Product Information of the book
+```bash
+table_rows = response.css('.table tr')
+```
+chacking lenth of row 
+```bash
+ len(tablerows)
+```
+## Step 34
+accessing each column of table
+Now lets iterate over each row and get details about
+```bash
+ tablerows[1].css("td ::text").get()
+```
+## Step 35
+Now let’s getting star rating of the book
+```bash
+response.css('p.star-rating').attrib['class']
+```
+## Step 36
+now open bookscraber.py file and code it 
+
+```bash
+   def parse_book_page(self , response):
+        table_rows = response.css('.table tr')
+        yield{
+            'url' :  response.url,
+            'title': response.css('.product_main h1::text').get() , 
+            'product_type' : table_rows[1].css('td ::text').get(),
+            'price_excl_tax)' : table_rows[2].css('td ::text').get(),
+            'price_incl_tax)' : table_rows[3].css('td ::text').get(),
+            'tax' : table_rows[4].css('td ::text').get(),
+            'availability' : table_rows[5].css('td ::text').get(),
+            'number_of_reviews' : table_rows[6].css('td ::text').get(),
+            'star' : response.css('p.star-rating').attrib['class'],
+            'category' : response.xpath('//*[@id="default"]/div/div/ul/li[3]/a/text()').get(),
+            'description' : response.xpath('/html/body/div/div/div[2]/div[2]/article/p/text()').get(),
+            'price' : response.css('p.price_color::text').get()
+            # 'review' : review_items
+        }
+        
+
+```
+```bash
+    def parse(self, response):
+        books = response.css('article.product_pod')
+        
+        for book in books:
+            relative_url = response.css('h3 a ::attr(href)').get()
+            if "catalogue/" in relative_url:
+                
+                book_url = "https://books.toscrape.com/" + relative_url
+            else:
+                book_url = "https://books.toscrape.com/catalogue/" + relative_url
+            yield response.follow(book_url, callback=self.parse)
+            
+        next_page = response.css('li.next a ::attr(href)').get()  
+        
+        if next_page is not None:
+            if "catalogue/" in relative_url:
+                
+                next_page_url = "https://books.toscrape.com/" + relative_url
+            else:
+                next_page_url = "https://books.toscrape.com/catalogue/" + relative_url
+            yield response.follow(next_page_url, callback=self.parse)
+
+```
+## Step 37
+ now we open  the terminal and run our code using this command `scrapy crawl book -o items.json`
+ 
+
+```bash
+scrapy crawl bookspider -o test.json
+```
+## Step 40
+if you show some error change someting in code
+
+```bash
+import scrapy
+
+
+class BookspiderSpider(scrapy.Spider):
+    name = "bookspider"
+    allowed_domains = ["books.toscrape.com"]
+    start_urls = ["https://books.toscrape.com"]
+
+    def parse(self, response):
+        books = response.css('article.product_pod')
+        
+        for book in books:
+            relative_url = book.css('h3 a::attr(href)').get()
+            book_url = response.urljoin(relative_url)
+            yield scrapy.Request(book_url, callback=self.parse_book_page)
+            
+        next_page = response.css('li.next a::attr(href)').get()  
+        
+        if next_page is not None:
+            next_page_url = response.urljoin(next_page)
+            yield scrapy.Request(next_page_url, callback=self.parse)
+
+    def parse_book_page(self, response):
+        table_rows = response.css('.table tr')
+        yield {
+            'url': response.url,
+            'title': response.css('.product_main h1::text').get(),
+            'product_type': table_rows[1].css('td::text').get(),
+            'price_excl_tax': table_rows[2].css('td::text').get(),
+            'price_incl_tax': table_rows[3].css('td::text').get(),
+            'tax': table_rows[4].css('td::text').get(),
+            'availability': table_rows[5].css('td::text').get(),
+            'number_of_reviews': table_rows[6].css('td::text').get(),
+            'star': response.css('p.star-rating').attrib['class'],
+            'category': response.css('.breadcrumb li:nth-last-child(2) a::text').get(),
+            'description': response.css('div.product_description + p::text').get(),
+            'price': response.css('p.price_color::text').get()
+            # 'review': review_items
+        }
+
+```
+This Spider will crawl the website https://books.toscrape.com and extract information about each book such as title, price, etc
+ 
+
+```bash
+scrapy crawl bookspider -o test.json
+```
